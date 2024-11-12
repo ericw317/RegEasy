@@ -2,3 +2,4 @@ pip install psutil
 pip install python-registry
 pip install tzdata
 pip install pytz
+pip install impacket

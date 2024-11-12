@@ -18,7 +18,7 @@ def int_between_numbers(prompt, lower_num, upper_num):
 def file_path(prompt):
     while True:
         path = input(prompt)
-        if os.path.exists(path):
+        if os.path.exists(path) or path == "-1":
             return path
         else:
             print(f"Error: Path not found. Try again.\n")

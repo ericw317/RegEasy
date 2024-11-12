@@ -3,7 +3,7 @@ from CustomLibs import ShadowCopies
 from CustomLibs import InputValidation as IV
 import shutil
 
-timezone = None
+timezone = "America/New_York"
 
 # set path
 def set_path(artifact_path, drive):

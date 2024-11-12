@@ -16,4 +16,9 @@ After you select the initial option, you will be presented with a list of inform
 
 IMPORTANT:
 FOR BEST RESULTS THIS MUST BE RUN AS ADMINISTRATOR, otherwise you might run into errors
-This is a work in progress. At the moment it can only parse the SYSTEM and SOFTWARE registry hives. I'll be adding full capabilities soon.
+This is a work in progress. At the moment it can only parse the following hives:
+- SAM
+- SYSTEM
+- SOFTWARE
+
+I will be adding more capabilities soon.

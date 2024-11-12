@@ -2,6 +2,7 @@ from CustomLibs import InputValidation as IV
 from CustomLibs import list_functions
 from CustomLibs import parse_system
 from CustomLibs import parse_software
+from CustomLibs import parse_sam
 from Registry import Registry
 import config
 import psutil
@@ -68,42 +69,60 @@ def identify_registry_hive(filepath):
 
 # parse registry
 def parse_registry(drive=None):
-    potential_reg_files = ["SYSTEM", "SOFTWARE"]
+    potential_reg_files = ["SYSTEM", "SOFTWARE", "SAM"]
     reg_file = None
 
-    if drive is not None:  # execute this block if drive is being analyzed
-        # set variables
-        registry_path = config.set_path("Windows\\System32\\config", drive)
-        reg_list = []
+    while True:
+        if drive is not None:  # execute this block if drive is being analyzed
+            # set variables
+            registry_path = config.set_path("Windows\\System32\\config", drive)
+            reg_list = []
 
-        # add found registry files to reg_list
-        for file in os.listdir(registry_path):
-            if file in potential_reg_files:
-                reg_list.append(file)
+            # add found registry files to reg_list
+            for file in os.listdir(registry_path):
+                if file in potential_reg_files:
+                    reg_list.append(file)
 
-        # prompt reg file selection
-        reg_list_numbered = list_functions.print_list_numbered(reg_list)
-        selected_reg = IV.int_between_numbers(f"Select a registry file: {reg_list_numbered}\n", 0, len(reg_list))
-        reg_file = reg_list[selected_reg - 1]
+            # prompt reg file selection
+            reg_list_numbered = list_functions.print_list_numbered(reg_list)
+            selected_reg = IV.int_between_numbers(f"Select a registry file: {reg_list_numbered}\n0: Go Back\n", 0, len(reg_list))
 
-        # parse file
-        if reg_file == "SYSTEM":
-            parse_system.main(drive)
-        if reg_file == "SOFTWARE":
-            parse_software.main(drive)
-    else:  # execute this block if a single file is being analyzed
-        reg_path = ""
-        while not is_registry_file(reg_path) or reg_file not in potential_reg_files:
-            reg_path = IV.file_path("Enter path to registry file:\n")
-            reg_file = identify_registry_hive(reg_path)
-            if not is_registry_file(reg_path) or reg_file not in potential_reg_files:
-                print("Invalid file. Try again.\n")
+            if selected_reg == 0:
+                break
 
-        # parse file
-        if reg_file == "SYSTEM":
-            parse_system.main(reg_path)
-        if reg_file == "SOFTWARE":
-            parse_software.main(reg_path)
+            try:
+                reg_file = reg_list[selected_reg - 1]
+            except Exception:
+                reg_file = 0
+
+            # parse file
+            if reg_file == "SYSTEM":
+                parse_system.main(drive)
+            elif reg_file == "SOFTWARE":
+                parse_software.main(drive)
+            elif reg_file == "SAM":
+                parse_sam.main(drive)
+            elif reg_file == 0:
+                break
+        else:  # execute this block if a single file is being analyzed
+            reg_path = ""
+            while not is_registry_file(reg_path) or reg_file not in potential_reg_files:
+                reg_path = IV.file_path("Enter path to registry file (Enter -1 to go back):\n")
+                if reg_path == "-1":
+                    break
+                reg_file = identify_registry_hive(reg_path)
+                if not is_registry_file(reg_path) or reg_file not in potential_reg_files:
+                    print("Invalid file. Try again.\n")
+            if reg_path == "-1":
+                break
+
+            # parse file
+            if reg_file == "SYSTEM":
+                parse_system.main(reg_path)
+            elif reg_file == "SOFTWARE":
+                parse_software.main(reg_path)
+            elif reg_file == "SAM":
+                parse_sam.main(reg_path)
 
 
 global loop
