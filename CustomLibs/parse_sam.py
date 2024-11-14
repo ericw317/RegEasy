@@ -98,7 +98,7 @@ def extract_ntlm_hashes(sam_hive, system_hive):
         return None
 
 def main(drive):
-    # copy SYSTEM file
+    # copy SAM file
     if drive == "C:\\" and not os.path.exists("SAM_copy"):
         config.copy_locked_reg("SAM")
     elif drive != "C:\\" and len(drive) < 4:

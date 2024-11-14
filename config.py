@@ -41,7 +41,10 @@ def copy_locked_reg(reg_file, user=None):
 # copy registry files from mounted drive
 def copy_reg(drive, reg_file, user=None):
     # set path
-    reg_source = f"{drive}[root]\\Windows\\System32\\config\\{reg_file}"
+    if not user:
+        reg_source = f"{drive}[root]\\Windows\\System32\\config\\{reg_file}"
+    else:
+        reg_source = f"{drive}[root]\\Users\\{user}\\NTUSER.DAT"
     destination_path = os.path.join(os.getcwd(), f"{reg_file}_copy")
 
     # copy reg file

@@ -3,6 +3,7 @@ from CustomLibs import list_functions
 from CustomLibs import parse_system
 from CustomLibs import parse_software
 from CustomLibs import parse_sam
+from CustomLibs import parse_ntuser
 from Registry import Registry
 import config
 import psutil
@@ -69,7 +70,7 @@ def identify_registry_hive(filepath):
 
 # parse registry
 def parse_registry(drive=None):
-    potential_reg_files = ["SYSTEM", "SOFTWARE", "SAM"]
+    potential_reg_files = ["SYSTEM", "SOFTWARE", "SAM", "NTUSER.DAT"]
     reg_file = None
 
     while True:
@@ -82,6 +83,7 @@ def parse_registry(drive=None):
             for file in os.listdir(registry_path):
                 if file in potential_reg_files:
                     reg_list.append(file)
+            reg_list.append("NTUSER.DAT")
 
             # prompt reg file selection
             reg_list_numbered = list_functions.print_list_numbered(reg_list)
@@ -102,6 +104,8 @@ def parse_registry(drive=None):
                 parse_software.main(drive)
             elif reg_file == "SAM":
                 parse_sam.main(drive)
+            elif reg_file == "NTUSER.DAT":
+                parse_ntuser.main(drive, mount=True)
             elif reg_file == 0:
                 break
         else:  # execute this block if a single file is being analyzed
@@ -123,6 +127,8 @@ def parse_registry(drive=None):
                 parse_software.main(reg_path)
             elif reg_file == "SAM":
                 parse_sam.main(reg_path)
+            elif reg_file == "NTUSER.DAT":
+                parse_ntuser.main(reg_path)
 
 
 global loop
