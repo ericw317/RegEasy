@@ -25,8 +25,20 @@ def filetime_to_datetime(filetime_bytes):
 def parse_timezone(reg, all=False):
     key = reg.open(r"ControlSet001\Control\TimeZoneInformation")
     timezone_list = []
-    timezone_list.append(key.value("TimeZoneKeyName").value())
-    output = display_functions.one_value("Time Zone Information", timezone_list)
+
+    # get timezone data
+    timezone_key_name = key.value("TimeZoneKeyName").value()
+    bias = key.value("Bias").value()
+    daylight_bias = int(key.value("DaylightBias").value()) - 2**32
+    active_time_bias = key.value("ActiveTimeBias").value()
+
+    # append to timezone list
+    timezone_list.append([timezone_key_name, str(bias), str(daylight_bias), str(active_time_bias)])
+
+    # display data
+    output = ["TIME ZONE INFORMATION"]
+    output += display_functions.four_values("Timezone Key Name", "Bias", "Daylight Bias",
+                                           "Active Time Bias", timezone_list)
 
     for line in output:
         print(line)
