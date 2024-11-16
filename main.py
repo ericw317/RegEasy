@@ -134,7 +134,8 @@ def set_timezone():
     # prompt time zone selection
     timezone_list = ["America/New_York (EST/EDT)", "America/Chicago (CST/CDT)", "America/Denver (MST/MDT)",
                      "America/Los_Angeles (PST/PDT)", "Europe/London (GMT/BST)", "Europe/Paris (CET/CEST)",
-                     "Asia/Tokyo (JST)", "Asia/Shanghai (CST)", "Australia/Sydney (AEST/AEDT)", "UTC"]
+                     "Asia/Tokyo (JST)", "Asia/Shanghai (CST)", "Australia/Sydney (AEST/AEDT)",
+                     "Pacific/Auckland (NZST/NZDT)", "UTC"]
 
     timezone_select = IV.int_between_numbers(
         f"Select a timezone to display timestamps in: {list_functions.print_list_numbered(timezone_list)}\n",
