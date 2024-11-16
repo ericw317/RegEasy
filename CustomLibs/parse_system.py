@@ -4,9 +4,11 @@ from CustomLibs import list_functions as LF
 from CustomLibs import time_conversion as TC
 from CustomLibs import display_functions
 import datetime
+from datetime import datetime as dt
 import config
 import os
 import struct
+import pytz
 import io
 import contextlib
 
@@ -21,6 +23,21 @@ def filetime_to_datetime(filetime_bytes):
 
     return timestamp.replace(microsecond=0)
 
+def convert_timezone(timestamp):
+    # Parse the timestamp into a naive datetime object
+    naive_datetime = dt.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+
+    # set naive timezone
+    original_timezone = pytz.timezone("UTC")
+    localized_datetime = original_timezone.localize(naive_datetime)
+
+    # Convert to the target timezone (e.g., 'US/Eastern')
+    target_timezone = pytz.timezone(config.timezone)
+    converted_datetime = localized_datetime.astimezone(target_timezone)
+
+    return converted_datetime
+
+
 # parse timezone
 def parse_timezone(reg, all=False):
     key = reg.open(r"ControlSet001\Control\TimeZoneInformation")
@@ -29,8 +46,16 @@ def parse_timezone(reg, all=False):
     # get timezone data
     timezone_key_name = key.value("TimeZoneKeyName").value()
     bias = key.value("Bias").value()
-    daylight_bias = int(key.value("DaylightBias").value()) - 2**32
+    if bias >= 2**31:
+        bias = bias - 2**32
+
+    daylight_bias = key.value("DaylightBias").value()
+    if daylight_bias >= 2**31:
+        daylight_bias = daylight_bias - 2**32
+
     active_time_bias = key.value("ActiveTimeBias").value()
+    if active_time_bias >= 2**31:
+        active_time_bias = active_time_bias - 2**32
 
     # append to timezone list
     timezone_list.append([timezone_key_name, str(bias), str(daylight_bias), str(active_time_bias)])
@@ -80,6 +105,7 @@ def parse_USB_devices(reg, all=False):
                             for value in folder.values():
                                 try:
                                     timestamp = str(filetime_to_datetime(value.raw_data()))
+                                    timestamp = str(convert_timezone(timestamp))
                                     if not timestamp.startswith("1601"):
                                         if len(timestamp_collection) == 0:
                                             timestamp_collection = timestamp
@@ -123,18 +149,21 @@ def parse_USB_storage(reg, all=False):
                                 try:
                                     first_installed = data.value("(default)").value()
                                     first_installed = str(first_installed)[:19]
+                                    first_installed = str(convert_timezone(first_installed))
                                 except Exception:
                                     first_installed = ""
                             elif data.name() == "0066":  # search for "last connected"
                                 try:
                                     last_connected = data.value("(default)").value()
                                     last_connected = str(last_connected)[:19]
+                                    last_connected = str(convert_timezone(last_connected))
                                 except Exception:
                                     last_connected = ""
                             elif data.name() == "0067":  # search for "last removed"
                                 try:
                                     last_removed = data.value("(default)").value()
                                     last_removed = str(last_removed)[:19]
+                                    last_removed = str(convert_timezone(last_removed))
                                 except Exception:
                                     last_removed = ""
 

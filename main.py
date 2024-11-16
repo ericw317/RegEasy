@@ -130,13 +130,7 @@ def parse_registry(drive=None):
             elif reg_file == "NTUSER.DAT":
                 parse_ntuser.main(reg_path)
 
-
-global loop
-loop = True
-
-def main():
-    drive_list = list_drives()  # load drives
-
+def set_timezone():
     # prompt time zone selection
     timezone_list = ["America/New_York (EST/EDT)", "America/Chicago (CST/CDT)", "America/Denver (MST/MDT)",
                      "America/Los_Angeles (PST/PDT)", "Europe/London (GMT/BST)", "Europe/Paris (CET/CEST)",
@@ -148,17 +142,28 @@ def main():
 
     config.timezone = timezone_list[timezone_select - 1].split(" ")[0]
 
+
+global loop
+loop = True
+
+def main():
+    drive_list = list_drives()  # load drives
+    set_timezone()
+
     while loop:
         drive_or_file = IV.int_between_numbers("Analyze drive or single registry file?\n"
                                                "1) Drive\n"
                                                "2) Registry File\n"
-                                               "0) Exit Program\n", 0, 2)
+                                               "3) Set Time Zone\n"
+                                               "0) Exit Program\n", 0, 3)
         if drive_or_file == 1:
             drive = get_drive(drive_list)
             if drive != "Go Back":
                 parse_registry(drive)
         elif drive_or_file == 2:
             parse_registry()
+        elif drive_or_file == 3:
+            set_timezone()
         else:
             break
 
